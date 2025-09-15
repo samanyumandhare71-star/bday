@@ -5,28 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dalhousie Trip Birthday</title>
 <style>
+/* Reset and full height */
 * { box-sizing: border-box; margin:0; padding:0; }
-body, html { height: 100%; font-family: Arial, sans-serif; overflow: hidden; }
+html, body { width: 100%; height: 100%; font-family: Arial, sans-serif; overflow: hidden; }
 
+/* Stage wrapper */
 .stage-wrapper { position: relative; width: 100%; height: 100%; }
 
+/* Stage styling */
 .stage {
   position: absolute;
   top: 0; left: 0;
   width: 100%;
-  height: 100%;
-  padding: 40px;
+  height: 100vh; /* full viewport height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* vertically center */
+  align-items: center;     /* horizontally center */
   text-align: center;
   opacity: 0;
   transition: opacity 0.7s ease;
   z-index: 0;
 }
 
-.stage.active {
-  opacity: 1;
-  z-index: 1;
-}
+.stage.active { opacity: 1; z-index: 1; }
 
+/* Text & buttons */
 h1 { color: #000; font-size: 2em; margin-bottom: 20px; }
 .cake { font-size: 1.5em; }
 
@@ -35,7 +39,7 @@ input[type="text"] {
   font-size: 1.1em;
   border-radius: 8px;
   border: 1px solid #ccc;
-  margin-right: 10px;
+  margin-bottom: 20px;
 }
 
 button {
@@ -46,19 +50,20 @@ button {
   cursor: pointer;
   transition: all 0.3s;
 }
-
 #goBtn { background-color: #4CAF50; color: white; }
 #startBtn { background-color: #ff6f61; color: white; }
 #memoryStart { background-color: #ffb347; color: white; }
 .nextBtn, .prevBtn { background-color: #1E90FF; color:white; margin: 10px; }
-
 button:hover { transform: scale(1.05); }
 
+/* Video & memory images */
 video { max-width: 90%; border-radius: 10px; margin-top: 20px; }
 #memoryImg { max-width: 90%; max-height: 60%; border-radius: 10px; margin-top: 20px; }
 
+/* Final stage */
 #finalStage { background-color: pink; color: white; display:flex; flex-direction:column; justify-content:center; align-items:center; }
 
+/* Balloons animation */
 .balloon {
   position: absolute;
   width: 50px;
@@ -67,7 +72,6 @@ video { max-width: 90%; border-radius: 10px; margin-top: 20px; }
   bottom: -100px;
   animation: rise linear infinite;
 }
-
 @keyframes rise {
   0% { transform: translateY(0) rotate(0deg); }
   100% { transform: translateY(-120vh) rotate(360deg); }
@@ -137,11 +141,8 @@ createBalloons();
 let currentStage = 0;
 function goToStage(index){
   const stages = document.querySelectorAll('.stage');
-  stages.forEach((s,i)=>{
-    s.classList.toggle('active', i===index);
-  });
-  const balloons = document.getElementById('balloonsContainer');
-  balloons.style.display = (index<=1) ? 'block' : 'none';
+  stages.forEach((s,i)=> s.classList.toggle('active', i===index));
+  document.getElementById('balloonsContainer').style.display = (index<=1)?'block':'none';
 }
 
 // Stage 1 → Stage 2
@@ -167,10 +168,12 @@ document.getElementById('birthdayVideo').addEventListener('ended', ()=>{
 const memoryImages=['mem1.jpg','mem2.jpg','mem3.jpg','mem4.jpg','mem5.jpg','mem6.jpg','mem7.jpg'];
 let memIndex=0;
 const memImg=document.getElementById('memoryImg');
+
 document.querySelector('.nextBtn').addEventListener('click', ()=>{
   if(memIndex<memoryImages.length-1){ memIndex++; memImg.src=memoryImages[memIndex]; } 
   else goToStage(4);
 });
+
 document.querySelector('.prevBtn').addEventListener('click', ()=>{
   if(memIndex>0){ memIndex--; memImg.src=memoryImages[memIndex]; }
 });
