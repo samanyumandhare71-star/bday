@@ -5,32 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dalhousie Trip Birthday</title>
 <style>
-/* Reset and full height */
 * { box-sizing: border-box; margin:0; padding:0; }
-html, body { width: 100%; height: 100%; font-family: Arial, sans-serif; overflow: hidden; }
-
-/* Stage wrapper */
-.stage-wrapper { position: relative; width: 100%; height: 100%; }
+body, html { height: 100%; font-family: Arial, sans-serif; overflow: hidden; }
+.stage-wrapper { position: relative; width: 100%; height: 100%; transition: transform 1s ease; }
 
 /* Stage styling */
 .stage {
-  position: absolute;
-  top: 0; left: 0;
   width: 100%;
-  height: 100vh; /* full viewport height */
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* vertically center */
-  align-items: center;     /* horizontally center */
+  height: 100%;
+  padding: 40px;
   text-align: center;
-  opacity: 0;
-  transition: opacity 0.7s ease;
-  z-index: 0;
+  position: relative;
 }
 
-.stage.active { opacity: 1; z-index: 1; }
-
-/* Text & buttons */
 h1 { color: #000; font-size: 2em; margin-bottom: 20px; }
 .cake { font-size: 1.5em; }
 
@@ -39,7 +26,7 @@ input[type="text"] {
   font-size: 1.1em;
   border-radius: 8px;
   border: 1px solid #ccc;
-  margin-bottom: 20px;
+  margin-right: 10px;
 }
 
 button {
@@ -50,17 +37,18 @@ button {
   cursor: pointer;
   transition: all 0.3s;
 }
+
+/* Button styles */
 #goBtn { background-color: #4CAF50; color: white; }
 #startBtn { background-color: #ff6f61; color: white; }
 #memoryStart { background-color: #ffb347; color: white; }
 .nextBtn, .prevBtn { background-color: #1E90FF; color:white; margin: 10px; }
+
 button:hover { transform: scale(1.05); }
 
-/* Video & memory images */
 video { max-width: 90%; border-radius: 10px; margin-top: 20px; }
 #memoryImg { max-width: 90%; max-height: 60%; border-radius: 10px; margin-top: 20px; }
 
-/* Final stage */
 #finalStage { background-color: pink; color: white; display:flex; flex-direction:column; justify-content:center; align-items:center; }
 
 /* Balloons animation */
@@ -72,6 +60,7 @@ video { max-width: 90%; border-radius: 10px; margin-top: 20px; }
   bottom: -100px;
   animation: rise linear infinite;
 }
+
 @keyframes rise {
   0% { transform: translateY(0) rotate(0deg); }
   100% { transform: translateY(-120vh) rotate(360deg); }
@@ -80,23 +69,24 @@ video { max-width: 90%; border-radius: 10px; margin-top: 20px; }
 </head>
 <body>
 
-<div class="stage-wrapper">
+<div class="stage-wrapper" id="wrapper">
 
-  <!-- Stage 1 -->
-  <div class="stage active" id="stage1" style="background: url('background.jpg') no-repeat center center; background-size: cover;">
+  <!-- Stage 1: Name input -->
+  <div class="stage" id="stage1" 
+       style="background: url('background.jpg') no-repeat center center; background-size: cover;">
     <h1 id="stage1Header">All friends from Dalhousie trip wish you a very happy birthday <span class="cake">🎂</span></h1>
     <input type="text" id="firstName" placeholder="Enter your first name">
     <button id="goBtn">GO</button>
   </div>
 
-  <!-- Stage 2 -->
+  <!-- Stage 2: Greeting -->
   <div class="stage" id="stage2" style="background: url('background.jpg') no-repeat center center; background-size: cover;">
     <h1 id="greetName">Happy Birthday!</h1>
     <button id="startBtn">Can we start?</button>
   </div>
 
   <!-- Stage 3: Video -->
-  <div class="stage" id="stage3" style="background: pink;">
+  <div class="stage" id="stage3" style="background: pink;"> <!-- plain pink background -->
     <video id="birthdayVideo" controls>
       <source src="video.mp4" type="video/mp4">
       Your browser does not support the video tag.
@@ -113,36 +103,47 @@ video { max-width: 90%; border-radius: 10px; margin-top: 20px; }
     </div>
   </div>
 
-  <!-- Stage 5: Final -->
+  <!-- Stage 5: Final Wish -->
   <div class="stage" id="finalStage">
     <h1>Wish you a good day! 🎉</h1>
   </div>
 
 </div>
 
+<!-- Balloons container (only Stage 1 & 2) -->
 <div id="balloonsContainer"></div>
 
 <script>
-// Balloons
-function createBalloons(num=15){
+const totalStages = 5;
+const wrapper = document.getElementById('wrapper');
+let currentStage = 0;
+
+// Balloons creation
+function createBalloons(num = 10) {
   const container = document.getElementById('balloonsContainer');
-  for(let i=0;i<num;i++){
-    const b=document.createElement('div');
-    b.className='balloon';
-    b.style.left=Math.random()*90+'%';
-    b.style.background=`hsl(${Math.random()*360},70%,60%)`;
-    b.style.animationDuration=8+Math.random()*5+'s';
+  for(let i=0; i<num; i++){
+    const b = document.createElement('div');
+    b.classList.add('balloon');
+    b.style.left = Math.random() * 90 + '%';
+    b.style.background = `hsl(${Math.random()*360}, 70%, 60%)`;
+    b.style.animationDuration = 8 + Math.random()*5 + 's';
     container.appendChild(b);
   }
 }
-createBalloons();
+createBalloons(15);
 
-// Stage navigation
-let currentStage = 0;
+// Move to next stage function
 function goToStage(index){
-  const stages = document.querySelectorAll('.stage');
-  stages.forEach((s,i)=> s.classList.toggle('active', i===index));
-  document.getElementById('balloonsContainer').style.display = (index<=1)?'block':'none';
+  currentStage = index;
+  wrapper.style.transform = `translateY(-${index*100}vh)`;
+
+  // Show balloons only in Stage 1 & 2
+  const balloons = document.getElementById('balloonsContainer');
+  if(currentStage <= 1){
+    balloons.style.display = 'block';
+  } else {
+    balloons.style.display = 'none';
+  }
 }
 
 // Stage 1 → Stage 2
@@ -164,18 +165,25 @@ document.getElementById('birthdayVideo').addEventListener('ended', ()=>{
   goToStage(3);
 });
 
-// Memory images
-const memoryImages=['mem1.jpg','mem2.jpg','mem3.jpg','mem4.jpg','mem5.jpg','mem6.jpg','mem7.jpg'];
-let memIndex=0;
-const memImg=document.getElementById('memoryImg');
-
+// Memories navigation
+const memoryImages = [
+  'mem1.jpg',
+  'mem2.jpg',
+  'mem3.jpg',
+  'mem4.jpg',
+  'mem5.jpg',
+  'mem6.jpg',
+  'mem7.jpg'
+];
+let memIndex = 0;
+const memImg = document.getElementById('memoryImg');
 document.querySelector('.nextBtn').addEventListener('click', ()=>{
-  if(memIndex<memoryImages.length-1){ memIndex++; memImg.src=memoryImages[memIndex]; } 
-  else goToStage(4);
+  if(memIndex < memoryImages.length-1){
+    memIndex++; memImg.src = memoryImages[memIndex];
+  } else { goToStage(4); }
 });
-
 document.querySelector('.prevBtn').addEventListener('click', ()=>{
-  if(memIndex>0){ memIndex--; memImg.src=memoryImages[memIndex]; }
+  if(memIndex > 0){ memIndex--; memImg.src = memoryImages[memIndex]; }
 });
 
 // Memory Start button
